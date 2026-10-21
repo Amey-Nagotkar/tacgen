@@ -1,0 +1,10 @@
+1: t1 = i + 1
+2: t2 = arr[i]
+3: t3 = t2 * 2
+4: arr[t1] = t3
+5: t4 = b + 1
+6: param a
+7: param t4
+8: t5 = call f, 2
+9: y = t5
+instructions=9 temporaries=5 labels=0

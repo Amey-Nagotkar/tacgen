@@ -1,0 +1,7 @@
+1: if a >= b goto L1
+2: if c >= d goto L1
+3: x = 1
+4: goto L2
+5: L1: x = 2
+6: L2: y = 0
+instructions=6 temporaries=0 labels=2

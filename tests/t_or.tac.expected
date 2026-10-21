@@ -1,0 +1,5 @@
+1: if a < b goto L2
+2: if c >= d goto L1
+3: L2: x = 1
+4: L1: y = 0
+instructions=4 temporaries=0 labels=2

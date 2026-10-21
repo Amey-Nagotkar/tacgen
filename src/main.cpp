@@ -1,5 +1,6 @@
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "tacgen.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -16,6 +17,7 @@ int main(int argc, char* argv[]) {
     std::string filename;
     bool dump_tokens = false;
     bool dump_ast = false;
+    bool dump_tac = false;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -23,6 +25,8 @@ int main(int argc, char* argv[]) {
             dump_tokens = true;
         } else if (arg == "--ast") {
             dump_ast = true;
+        } else if (arg == "--tac") {
+            dump_tac = true;
         } else if (!arg.empty() && arg[0] == '-') {
             // Other CLI options to be handled in subsequent stages
         } else {
@@ -61,6 +65,14 @@ int main(int argc, char* argv[]) {
 
         if (dump_ast) {
             ast->print(std::cout);
+            return 0;
+        }
+
+        TACGenerator tacgen;
+        tacgen.generate(*ast);
+
+        if (dump_tac) {
+            tacgen.print(std::cout);
             return 0;
         }
     } catch (const ParseError& ex) {
