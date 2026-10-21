@@ -1,4 +1,4 @@
-# tacgen: Three Address Code Generator (Compiler Design Case Study)
+# tacgen: Three Address Code Generator 
 
 `tacgen` is an intermediate representation (IR) generator and optimizer for a C-like mini-language, implemented in standard C++17 with no external dependencies. It implements lexical analysis, recursive-descent parsing, syntax-directed TAC generation, multiple IR storage representations (quadruples, triples, indirect triples), control flow graph construction, basic block optimization passes, Cytron dominance-frontier SSA construction, Braun on-the-fly SSA construction, sparse SSA optimizations, and empirical metrics evaluation.
 
@@ -166,16 +166,10 @@ tacgen/
 
 ---
 
-## Reproducing Stage-2 Report Tables
 
-The commands in `tacgen` map directly to the hand-verified tables in the Stage-2 Report:
+# tacgen: Three Address Code Generator (Compiler Design Case Study)
 
-| Report Table | Description in Report | Command to Reproduce |
-|---|---|---|
-| **Table 4** | Token specification for the mini-language | `./build/tacgen bench/b1.mini --tokens` |
-| **Table 5** | Syntax-directed translation scheme | Evaluated during front-end parsing (`--tac`) |
-| **Table 6** | Source program & generated TAC for while-loop with relop | `./build/tacgen bench/b1.mini --tac` |
-| **Table 7** | Dominators, dominance frontiers & φ placement for `b1` | `./build/tacgen bench/b1.mini --ssa` |
-| **Table 8** | Conventional TAC vs SSA-form TAC for `b1` | `./build/tacgen bench/b1.mini --blocks`<br>`./build/tacgen bench/b1.mini --ssa` |
-| **Table 9** | Optimization pipeline on single basic block (`b2`) (12 $\to$ 4 instrs) | `./build/tacgen bench/b2.mini --opt --live-out y,z,w,u` |
-| **Table 10** | Edits needed to apply CSE to `a = b * -c + b * -c` (`b3`) | `./build/tacgen bench/b3.mini --formats`<br>`./build/tacgen bench/b3.mini --edit-demo "2:0,3:1"` |
+[**Launch TAC Generator Visualizer →**](https://amey-nagotkar.github.io/tacgen/)
+
+An interactive visualization of tokenization, Three Address Code, quadruples, triples, indirect triples, control-flow graphs, optimization, SSA, and benchmark metrics.
+
