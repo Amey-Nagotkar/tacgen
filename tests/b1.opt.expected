@@ -1,0 +1,23 @@
+No. | Pass                             | Changes | Instrs after
+0   | Unoptimized                      | 0       | 10
+1   | Constant folding and propagation | 0       | 10
+2   | Strength reduction               | 1       | 10
+3   | CSE by local value numbering     | 0       | 10
+4   | Copy propagation                 | 0       | 10
+5   | Dead-code elimination            | 0       | 10
+6   | Temporary coalescing             | 4       | 8
+
+optimized code:
+B1:
+    s = 0
+    i = 1
+B2: (labels L1)
+    if i > n goto L2
+B3:
+    t1 = i << 1
+    s = s + t1
+    i = i + 1
+    goto L1
+B4: (labels L2)
+    return s
+instructions: 10 -> 8   temporaries remaining: 1   liveness iterations: 3

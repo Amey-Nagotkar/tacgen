@@ -1,11 +1,13 @@
 #include "cfg.hpp"
 #include "formats.hpp"
 #include "lexer.hpp"
+#include "opt.hpp"
 #include "parser.hpp"
 #include "tacgen.hpp"
 
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -22,6 +24,9 @@ int main(int argc, char* argv[]) {
     bool dump_tac = false;
     bool dump_formats = false;
     bool dump_blocks = false;
+    bool dump_opt = false;
+    bool has_live_out = false;
+    std::set<std::string> user_live_out;
     std::string cfg_dot_file;
     std::string edit_demo_arg;
 
@@ -37,6 +42,29 @@ int main(int argc, char* argv[]) {
             dump_formats = true;
         } else if (arg == "--blocks") {
             dump_blocks = true;
+        } else if (arg == "--opt") {
+            dump_opt = true;
+        } else if (arg == "--live-out") {
+            if (i + 1 < argc) {
+                has_live_out = true;
+                std::string list_str = argv[++i];
+                std::stringstream ss(list_str);
+                std::string item;
+                while (std::getline(ss, item, ',')) {
+                    if (!item.empty()) user_live_out.insert(item);
+                }
+            } else {
+                std::cerr << "Error: --live-out requires variable list\n";
+                return 1;
+            }
+        } else if (arg.rfind("--live-out=", 0) == 0) {
+            has_live_out = true;
+            std::string list_str = arg.substr(11);
+            std::stringstream ss(list_str);
+            std::string item;
+            while (std::getline(ss, item, ',')) {
+                if (!item.empty()) user_live_out.insert(item);
+            }
         } else if (arg == "--cfg") {
             if (i + 1 < argc) {
                 cfg_dot_file = argv[++i];
@@ -127,6 +155,13 @@ int main(int argc, char* argv[]) {
             if (!cfg_dot_file.empty()) {
                 cfg.write_dot_file(cfg_dot_file);
             }
+            return 0;
+        }
+
+        if (dump_opt) {
+            Cfg cfg = buildCfg(tacgen.quads());
+            OptResult opt_res = optimize(std::move(cfg), user_live_out, has_live_out);
+            opt_res.print(std::cout);
             return 0;
         }
     } catch (const ParseError& ex) {

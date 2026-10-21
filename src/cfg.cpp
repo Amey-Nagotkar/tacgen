@@ -71,6 +71,7 @@ Cfg buildCfg(const std::vector<Quad>& quads) {
 
         for (size_t k = start; k <= end; ++k) {
             Quad q = quads[k];
+            q.orig_idx = static_cast<int>(k + 1);
             if (k == start) {
                 q.labels.clear(); // Clear on Quad as labels now belong to the Block
             }
@@ -363,4 +364,30 @@ void Cfg::write_dot_file(const std::string& filepath) const {
         throw std::runtime_error("Cannot open dot output file: " + filepath);
     }
     print_dot(out);
+}
+
+void Cfg::print_code(std::ostream& os) const {
+    for (const auto& b : blocks) {
+        os << "B" << b.id << ":";
+        if (!b.labels.empty()) {
+            os << " (labels ";
+            for (size_t i = 0; i < b.labels.size(); ++i) {
+                if (i > 0) os << ",";
+                os << b.labels[i];
+            }
+            os << ")";
+        }
+        if (b.instrs.empty()) {
+            os << " (empty)\n";
+        } else {
+            os << "\n";
+            for (const auto& q : b.instrs) {
+                os << "    " << q.to_string() << "\n";
+            }
+        }
+    }
+}
+
+void printBlockCode(const Cfg& cfg, std::ostream& os) {
+    cfg.print_code(os);
 }

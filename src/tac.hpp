@@ -31,6 +31,7 @@ struct Quad {
     std::string result;
     std::string rel;
     std::vector<std::string> labels;
+    int orig_idx = 0;
 
     // Format the TAC instruction body (excluding label prefixes)
     std::string to_string() const {

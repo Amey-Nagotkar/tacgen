@@ -32,7 +32,11 @@ struct Cfg {
     void print_blocks(std::ostream& os) const;
     void print_dot(std::ostream& os) const;
     void write_dot_file(const std::string& filepath) const;
+    void print_code(std::ostream& os) const;
 };
+
+// Shared block printer (exact format B1:\n    x = y\n)
+void printBlockCode(const Cfg& cfg, std::ostream& os);
 
 // Constructs the CFG, performs dead code/unreachable block elimination from B1,
 // identifies retreating DFS back edges, and renumbers blocks consecutively.

@@ -1,0 +1,4 @@
+int x; int a; int b; int y;
+x = a + b;
+a = 5;
+y = a + b;

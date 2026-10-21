@@ -1,0 +1,16 @@
+No. | Pass                             | Changes | Instrs after
+0   | Unoptimized                      | 0       | 12
+1   | Constant folding and propagation | 6       | 12
+2   | Strength reduction               | 1       | 12
+3   | CSE by local value numbering     | 1       | 12
+4   | Copy propagation                 | 1       | 12
+5   | Dead-code elimination            | 6       | 6
+6   | Temporary coalescing             | 5       | 4
+
+optimized code:
+B1:
+    y = 23
+    z = a << 3
+    w = b + c
+    u = w
+instructions: 12 -> 4   temporaries remaining: 0   liveness iterations: 2
