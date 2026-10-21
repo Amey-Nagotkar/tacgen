@@ -4,6 +4,7 @@
 #include "opt.hpp"
 #include "parser.hpp"
 #include "ssa.hpp"
+#include "ssaopt.hpp"
 #include "tacgen.hpp"
 
 #include <fstream>
@@ -15,7 +16,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <file.mini> [--tokens] [--ast] [--tac] [--formats] [--blocks] [--cfg out.dot] [--edit-demo \"R:K,R:K\"] [--opt] [--ssa] [--ssa-unpruned] [--metrics] [--live-out a,b,c] [--all]\n";
+        std::cerr << "Usage: " << argv[0] << " <file.mini> [--tokens] [--ast] [--tac] [--formats] [--blocks] [--cfg out.dot] [--edit-demo \"R:K,R:K\"] [--opt] [--ssa] [--ssa-unpruned] [--ssa-opt] [--metrics] [--live-out a,b,c] [--all]\n";
         return 1;
     }
 
@@ -28,6 +29,7 @@ int main(int argc, char* argv[]) {
     bool dump_opt = false;
     bool dump_ssa = false;
     bool ssa_unpruned = false;
+    bool dump_ssa_opt = false;
     bool has_live_out = false;
     std::set<std::string> user_live_out;
     std::string cfg_dot_file;
@@ -52,6 +54,8 @@ int main(int argc, char* argv[]) {
         } else if (arg == "--ssa-unpruned") {
             dump_ssa = true;
             ssa_unpruned = true;
+        } else if (arg == "--ssa-opt") {
+            dump_ssa_opt = true;
         } else if (arg == "--live-out") {
             if (i + 1 < argc) {
                 has_live_out = true;
@@ -177,6 +181,14 @@ int main(int argc, char* argv[]) {
             Cfg cfg = buildCfg(tacgen.quads());
             SsaResult ssa_res = convertToSsa(std::move(cfg), !ssa_unpruned, user_live_out, has_live_out);
             ssa_res.print(std::cout);
+            return 0;
+        }
+
+        if (dump_ssa_opt) {
+            Cfg cfg = buildCfg(tacgen.quads());
+            SsaResult ssa_res = convertToSsa(std::move(cfg), true /*pruned*/, user_live_out, has_live_out);
+            SsaOptResult opt_res = optimizeSsa(std::move(ssa_res.cfg), ssa_res.dom);
+            opt_res.print(std::cout);
             return 0;
         }
     } catch (const ParseError& ex) {

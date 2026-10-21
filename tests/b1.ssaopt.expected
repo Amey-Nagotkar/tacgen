@@ -1,0 +1,14 @@
+B1: (empty)
+B2: (labels L1)
+    s2 = phi(0, t2)
+    i2 = phi(1, t3)
+    if i2 > n goto L2
+B3:
+    t1 = i2 << 1
+    t2 = s2 + t1
+    t3 = i2 + 1
+    goto L1
+B4: (labels L2)
+    return s2
+ssa instrs: 12 -> 8   rounds: 1   copies propagated: 2   phis removed: 0   dataflow iterations: 0
+verify: OK
