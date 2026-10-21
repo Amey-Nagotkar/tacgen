@@ -1,0 +1,7 @@
+int x; int y; int z; int w; int u; int k;
+x = 4*5;
+y = x+3;
+z = a*8;
+w = b+c;
+u = b+c;
+k = y*2;
