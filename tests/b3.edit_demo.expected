@@ -1,0 +1,4 @@
+edit                        | quadruples | triples | indirect triples
+instructions removed:       2 | 2 | 2
+operand fields rewritten:   1 | 2 | 1
+surviving indices changed:  0 | 2 | 0

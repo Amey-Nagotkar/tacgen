@@ -1,0 +1,31 @@
+QUADRUPLES
+index  op      arg1    arg2    result  label
+(0)    minus   c               t1      
+(1)    *       b       t1      t2      
+(2)    minus   c               t3      
+(3)    *       b       t3      t4      
+(4)    +       t2      t4      t5      
+(5)    =       t5              a       
+
+TRIPLES
+index  op      arg1    arg2    label
+(0)    minus   c               
+(1)    *       b       (0)     
+(2)    minus   c               
+(3)    *       b       (2)     
+(4)    +       (1)     (3)     
+(5)    =       a       (4)     
+
+INDIRECT TRIPLES
+pointer  target
+35       (0)
+36       (1)
+37       (2)
+38       (3)
+39       (4)
+40       (5)
+
+format           | entries | bytes
+quadruples       | 6       | 78
+triples          | 6       | 54
+indirect triples | 6       | 78
