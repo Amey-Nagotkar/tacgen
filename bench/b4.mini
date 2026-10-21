@@ -1,0 +1,20 @@
+// b4: synthetic benchmark, nested loops, branches, array access, many temporaries
+int n; int i; int j; int sum; int t; int max; int arr;
+sum = 0;
+max = 0;
+i = 0;
+while (i < n) {
+    j = 0;
+    while (j < i && j < 10) {
+        t = arr[j] * 4 + arr[i] * 4;
+        if (t > max || t == 0) {
+            max = t;
+        } else {
+            sum = sum + (t - max) * 2;
+        }
+        j = j + 1;
+    }
+    sum = sum + i * 8 + (i + 1) * 8;
+    i = i + 1;
+}
+return sum + max;

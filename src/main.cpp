@@ -1,6 +1,8 @@
+#include "braun.hpp"
 #include "cfg.hpp"
 #include "formats.hpp"
 #include "lexer.hpp"
+#include "metrics.hpp"
 #include "opt.hpp"
 #include "parser.hpp"
 #include "ssa.hpp"
@@ -16,7 +18,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <file.mini> [--tokens] [--ast] [--tac] [--formats] [--blocks] [--cfg out.dot] [--edit-demo \"R:K,R:K\"] [--opt] [--ssa] [--ssa-unpruned] [--ssa-opt] [--metrics] [--live-out a,b,c] [--all]\n";
+        std::cerr << "Usage: " << argv[0] << " <file.mini> [--tokens] [--ast] [--tac] [--formats] [--blocks] [--cfg out.dot] [--edit-demo \"R:K,R:K\"] [--opt] [--ssa] [--ssa-unpruned] [--ssa-opt] [--ssa-braun] [--ssa-compare] [--metrics] [--live-out a,b,c] [--all]\n";
         return 1;
     }
 
@@ -30,6 +32,13 @@ int main(int argc, char* argv[]) {
     bool dump_ssa = false;
     bool ssa_unpruned = false;
     bool dump_ssa_opt = false;
+    bool dump_braun = false;
+    bool dump_compare = false;
+    bool dump_metrics = false;
+    bool dump_metrics_all = false;
+    std::string metrics_all_dir;
+    int runs = 2000;
+    bool dump_all = false;
     bool has_live_out = false;
     std::set<std::string> user_live_out;
     std::string cfg_dot_file;
@@ -56,6 +65,33 @@ int main(int argc, char* argv[]) {
             ssa_unpruned = true;
         } else if (arg == "--ssa-opt") {
             dump_ssa_opt = true;
+        } else if (arg == "--ssa-braun") {
+            dump_braun = true;
+        } else if (arg == "--ssa-compare") {
+            dump_compare = true;
+        } else if (arg == "--metrics") {
+            dump_metrics = true;
+        } else if (arg == "--metrics-all") {
+            dump_metrics_all = true;
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                metrics_all_dir = argv[++i];
+            } else {
+                metrics_all_dir = "bench";
+            }
+        } else if (arg.rfind("--metrics-all=", 0) == 0) {
+            dump_metrics_all = true;
+            metrics_all_dir = arg.substr(14);
+        } else if (arg == "--runs") {
+            if (i + 1 < argc) {
+                runs = std::stoi(argv[++i]);
+            } else {
+                std::cerr << "Error: --runs requires integer N\n";
+                return 1;
+            }
+        } else if (arg.rfind("--runs=", 0) == 0) {
+            runs = std::stoi(arg.substr(7));
+        } else if (arg == "--all") {
+            dump_all = true;
         } else if (arg == "--live-out") {
             if (i + 1 < argc) {
                 has_live_out = true;
@@ -104,9 +140,43 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    if (dump_metrics_all) {
+        if (metrics_all_dir.empty()) {
+            metrics_all_dir = "bench";
+        }
+        try {
+            runMetricsAll(metrics_all_dir, runs, user_live_out, has_live_out, std::cout);
+            return 0;
+        } catch (const std::exception& ex) {
+            std::cerr << "Error: " << ex.what() << "\n";
+            return 1;
+        }
+    }
+
     if (filename.empty()) {
         std::cerr << "Error: no input file specified.\n";
         return 1;
+    }
+
+    if (dump_metrics) {
+        try {
+            BenchmarkMetrics m = computeMetrics(filename, runs, user_live_out, has_live_out);
+            printSingleMetricsTable(m, std::cout);
+            return 0;
+        } catch (const std::exception& ex) {
+            std::cerr << "Error: " << ex.what() << "\n";
+            return 1;
+        }
+    }
+
+    if (dump_all) {
+        try {
+            runAllStages(filename, user_live_out, has_live_out, std::cout);
+            return 0;
+        } catch (const std::exception& ex) {
+            std::cerr << "Error: " << ex.what() << "\n";
+            return 1;
+        }
     }
 
     std::ifstream file(filename);
@@ -189,6 +259,19 @@ int main(int argc, char* argv[]) {
             SsaResult ssa_res = convertToSsa(std::move(cfg), true /*pruned*/, user_live_out, has_live_out);
             SsaOptResult opt_res = optimizeSsa(std::move(ssa_res.cfg), ssa_res.dom);
             opt_res.print(std::cout);
+            return 0;
+        }
+
+        if (dump_braun) {
+            Cfg cfg = buildCfg(tacgen.quads());
+            BraunResult braun_res = constructSsaBraun(std::move(cfg), user_live_out, has_live_out);
+            braun_res.print(std::cout);
+            return 0;
+        }
+
+        if (dump_compare) {
+            Cfg cfg = buildCfg(tacgen.quads());
+            compareSsa(std::move(cfg), user_live_out, has_live_out, std::cout);
             return 0;
         }
     } catch (const ParseError& ex) {

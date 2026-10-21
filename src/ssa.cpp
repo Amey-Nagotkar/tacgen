@@ -401,7 +401,9 @@ SsaResult convertToSsa(Cfg cfg, bool pruned,
             if (q.op == OpType::PHI) {
                 std::string var = q.arg1;
                 int ver = ++counters[var];
-                std::string new_name = var + std::to_string(ver);
+                std::string new_name = (var == "t" || (!var.empty() && std::isdigit(var.back())))
+                                           ? (var + "_" + std::to_string(ver))
+                                           : (var + std::to_string(ver));
                 q.result = new_name;
                 stacks[var].push_back(new_name);
                 pushed.push_back(var);
@@ -432,7 +434,9 @@ SsaResult convertToSsa(Cfg cfg, bool pruned,
                 std::string d = defOf(q);
                 if (!d.empty() && var_set.count(d)) {
                     int ver = ++counters[d];
-                    std::string new_name = d + std::to_string(ver);
+                    std::string new_name = (d == "t" || (!d.empty() && std::isdigit(d.back())))
+                                               ? (d + "_" + std::to_string(ver))
+                                               : (d + std::to_string(ver));
                     q.result = new_name;
                     stacks[d].push_back(new_name);
                     pushed.push_back(d);
