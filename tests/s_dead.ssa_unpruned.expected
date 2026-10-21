@@ -1,0 +1,19 @@
+Block | idom | DF     | phi placed for
+B1    | -    | {}     | -
+B2    | B1   | {B4}   | -
+B3    | B1   | {B4}   | -
+B4    | B1   | {}     | x
+
+B1:
+    if c >= d goto L1
+B2:
+    x1 = 1
+    goto L2
+B3: (labels L1)
+    x2 = 2
+B4: (labels L2)
+    x3 = phi(x1, x2)
+    y1 = 5
+    return y1
+phis_unpruned=1 phis_pruned=0
+verify: OK

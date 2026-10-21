@@ -1,0 +1,13 @@
+Block | idom | DF     | phi placed for
+B1    | -    | {}     | -
+
+B1:
+    t1 = minus c
+    t2 = b * t1
+    t3 = minus c
+    t4 = b * t3
+    t5 = t2 + t4
+    a1 = t5
+    exit_use a1
+phis_unpruned=0 phis_pruned=0
+verify: OK

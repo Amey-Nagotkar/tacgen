@@ -1,0 +1,4 @@
+int x; int y;
+if (c < d) x = 1; else x = 2;
+y = 5;
+return y;

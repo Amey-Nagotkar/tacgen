@@ -1,0 +1,24 @@
+Block | idom | DF     | phi placed for
+B1    | -    | {}     | -
+B2    | B1   | {B2}   | s,i
+B3    | B2   | {B2}   | -
+B4    | B2   | {}     | -
+
+B1:
+    s1 = 0
+    i1 = 1
+B2: (labels L1)
+    s2 = phi(s1, s3)
+    i2 = phi(i1, i3)
+    if i2 > n goto L2
+B3:
+    t1 = i2 * 2
+    t2 = s2 + t1
+    s3 = t2
+    t3 = i2 + 1
+    i3 = t3
+    goto L1
+B4: (labels L2)
+    return s2
+phis_unpruned=2 phis_pruned=2
+verify: OK

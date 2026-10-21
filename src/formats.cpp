@@ -104,6 +104,13 @@ void FormatsManager::build_quadruples(const std::vector<Quad>& quads) {
                 row.arg2 = "";
                 row.result = "";
                 break;
+            case OpType::PHI:
+                row.op = "phi";
+                row.result = q.result;
+                break;
+            case OpType::EXIT_USE:
+                row.op = "exit_use";
+                break;
         }
         quads_table_.push_back(std::move(row));
     }
@@ -200,6 +207,10 @@ void FormatsManager::build_triples(const std::vector<Quad>& quads) {
             }
             case OpType::NOP: {
                 triples_table_.push_back(TripleRow{"nop", "", "", q.labels});
+                break;
+            }
+            case OpType::PHI:
+            case OpType::EXIT_USE: {
                 break;
             }
         }

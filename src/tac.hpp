@@ -21,17 +21,27 @@ enum class OpType {
     RETURN,       // return arg1 (arg1 optional)
     ARRAY_LOAD,   // result = arg1[arg2]
     ARRAY_STORE,  // result[arg1] = arg2
-    NOP           // nop
+    NOP,          // nop
+    PHI,          // result = phi(phiArgs...)
+    EXIT_USE      // exit_use phiArgs...
 };
 
 struct Quad {
-    OpType op;
+    OpType op = OpType::NOP;
     std::string arg1;
     std::string arg2;
     std::string result;
     std::string rel;
     std::vector<std::string> labels;
     int orig_idx = 0;
+    std::vector<std::string> phiArgs;
+
+    Quad() = default;
+    Quad(OpType op, std::string a1 = "", std::string a2 = "", std::string res = "",
+         std::string r = "", std::vector<std::string> lbls = {}, int o_idx = 0,
+         std::vector<std::string> pArgs = {})
+        : op(op), arg1(std::move(a1)), arg2(std::move(a2)), result(std::move(res)),
+          rel(std::move(r)), labels(std::move(lbls)), orig_idx(o_idx), phiArgs(std::move(pArgs)) {}
 
     // Format the TAC instruction body (excluding label prefixes)
     std::string to_string() const {
@@ -64,6 +74,23 @@ struct Quad {
                 return result + "[" + arg1 + "] = " + arg2;
             case OpType::NOP:
                 return "nop";
+            case OpType::PHI: {
+                std::string s = result + " = phi(";
+                for (size_t i = 0; i < phiArgs.size(); ++i) {
+                    if (i > 0) s += ", ";
+                    s += phiArgs[i];
+                }
+                s += ")";
+                return s;
+            }
+            case OpType::EXIT_USE: {
+                std::string s = "exit_use ";
+                for (size_t i = 0; i < phiArgs.size(); ++i) {
+                    if (i > 0) s += ", ";
+                    s += phiArgs[i];
+                }
+                return s;
+            }
         }
         return "";
     }
@@ -116,6 +143,7 @@ inline std::string defOf(const Quad& q) {
         case OpType::UNARY_MINUS:
         case OpType::CALL:
         case OpType::ARRAY_LOAD:
+        case OpType::PHI:
             return q.result;
         default:
             return "";
@@ -152,6 +180,12 @@ inline std::vector<std::string*> usesOf(Quad& q) {
             add(q.result); // array identifier
             add(q.arg1);   // index
             add(q.arg2);   // value
+            break;
+        case OpType::PHI:
+        case OpType::EXIT_USE:
+            for (auto& arg : q.phiArgs) {
+                add(arg);
+            }
             break;
         case OpType::CALL:
         case OpType::GOTO:
@@ -190,6 +224,12 @@ inline std::vector<const std::string*> usesOf(const Quad& q) {
             add(q.result); // array identifier
             add(q.arg1);   // index
             add(q.arg2);   // value
+            break;
+        case OpType::PHI:
+        case OpType::EXIT_USE:
+            for (const auto& arg : q.phiArgs) {
+                add(arg);
+            }
             break;
         case OpType::CALL:
         case OpType::GOTO:
