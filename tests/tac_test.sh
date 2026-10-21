@@ -4,7 +4,7 @@ set -e
 # Compiler acceptance tests for TAC generation module
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BIN="${1:-${PROJECT_ROOT}/build/tacgen}"
+BIN="${1:-${TACGEN:-${PROJECT_ROOT}/build/tacgen}}"
 
 if [ ! -x "$BIN" ]; then
     echo "Error: tacgen binary not found at '$BIN'. Please build first."

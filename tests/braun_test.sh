@@ -2,7 +2,7 @@
 set -e
 
 # Braun SSA Construction Acceptance Tests
-TACGEN="./build/tacgen"
+TACGEN="${1:-${TACGEN:-./build/tacgen}}"
 
 if [ ! -f "$TACGEN" ]; then
     echo "Error: tacgen executable not found at $TACGEN. Build first."
