@@ -2,6 +2,8 @@
 
 `tacgen` is an intermediate representation (IR) generator and optimizer for a C-like mini-language, implemented in standard C++17 with no external dependencies. It implements lexical analysis, recursive-descent parsing, syntax-directed TAC generation, multiple IR storage representations (quadruples, triples, indirect triples), control flow graph construction, basic block optimization passes, Cytron dominance-frontier SSA construction, Braun on-the-fly SSA construction, sparse SSA optimizations, and empirical metrics evaluation.
 
+[**Launch TAC Generator Visualizer →**](https://amey-nagotkar.github.io/tacgen/)
+
 ---
 
 ## Build and Run Instructions
@@ -167,9 +169,5 @@ tacgen/
 ---
 
 
-# tacgen: Three Address Code Generator (Compiler Design Case Study)
 
-[**Launch TAC Generator Visualizer →**](https://amey-nagotkar.github.io/tacgen/)
-
-An interactive visualization of tokenization, Three Address Code, quadruples, triples, indirect triples, control-flow graphs, optimization, SSA, and benchmark metrics.
 
