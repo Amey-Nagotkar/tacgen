@@ -1,0 +1,34 @@
+digraph CFG {
+  node [shape=box, fontname="Courier"];
+  edge [fontname="Courier"];
+
+  B1 [label="B1\lsum = 0\lmax = 0\li = 0\l"];
+  B2 [label="B2 (L1)\lif i >= n goto L2\l"];
+  B3 [label="B3\lj = 0\l"];
+  B4 [label="B4 (L3)\lif j >= i goto L4\l"];
+  B5 [label="B5\lif j >= 10 goto L4\l"];
+  B6 [label="B6\lt1 = arr[j]\lt2 = t1 * 4\lt3 = arr[i]\lt4 = t3 * 4\lt5 = t2 + t4\lt = t5\lif t > max goto L7\l"];
+  B7 [label="B7\lif t != 0 goto L5\l"];
+  B8 [label="B8 (L7)\lmax = t\lgoto L6\l"];
+  B9 [label="B9 (L5)\lt6 = t - max\lt7 = t6 * 2\lt8 = sum + t7\lsum = t8\l"];
+  B10 [label="B10 (L6)\lt9 = j + 1\lj = t9\lgoto L3\l"];
+  B11 [label="B11 (L4)\lt10 = i * 8\lt11 = sum + t10\lt12 = i + 1\lt13 = t12 * 8\lt14 = t11 + t13\lsum = t14\lt15 = i + 1\li = t15\lgoto L1\l"];
+  B12 [label="B12 (L2)\lt16 = sum + max\lreturn t16\l"];
+
+  B1 -> B2;
+  B2 -> B3 [label="i < n"];
+  B2 -> B12 [label="i >= n"];
+  B3 -> B4;
+  B4 -> B5 [label="j < i"];
+  B4 -> B11 [label="j >= i"];
+  B5 -> B6 [label="j < 10"];
+  B5 -> B11 [label="j >= 10"];
+  B6 -> B7 [label="t <= max"];
+  B6 -> B8 [label="t > max"];
+  B7 -> B8 [label="t == 0"];
+  B7 -> B9 [label="t != 0"];
+  B8 -> B10;
+  B9 -> B10;
+  B10 -> B4 [color=red];
+  B11 -> B2 [color=red];
+}

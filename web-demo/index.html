@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAC Generator Visualizer | Compiler Design Case Study</title>
+  <meta name="description" content="Interactive empirical visualizer for Three Address Code generation, storage representations (quadruples, triples, indirect triples), CFG, optimization pipelines, and SSA construction.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="dark-theme">
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Header / Navigation Bar -->
+  <header id="app-header" class="app-header">
+    <div class="header-inner container">
+      <div class="brand-group">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-wrap">
+            <h1 class="brand-title">TAC Generator Visualizer</h1>
+            <span class="badge badge-accent">Stage-2 Compiler Report</span>
+          </div>
+          <p class="brand-subtitle">Three Address Code, Formats, CFG, Optimization &amp; SSA Forms</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="provenance-pill">
+          <span class="status-dot"></span>
+          <span>Precomputed Compiler Results</span>
+        </div>
+        <button id="btn-reset-default" class="btn btn-secondary btn-sm" title="Reset to default benchmark and first tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          Reset
+        </button>
+        <a id="btn-download-csv" href="data/metrics.csv" download="metrics.csv" class="btn btn-primary btn-sm" title="Download benchmark metrics CSV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Metrics CSV
+        </a>
+        <a href="https://github.com/Amey-Nagotkar/tacgen" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm repo-link" title="View Source on GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          Repository
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main App Layout -->
+  <main class="app-main container">
+    <!-- Project Banner & Authors Card -->
+    <section class="meta-banner card">
+      <div class="meta-banner-content">
+        <div class="meta-badges">
+          <span class="badge badge-indigo">Compiler Design 2026-2027</span>
+          <span class="badge badge-purple">Autonomous SAKEC</span>
+          <span class="badge badge-teal">Case Study Stage-2</span>
+          <span class="badge badge-neutral">C++17 Native Engine</span>
+        </div>
+        <p class="project-summary">
+          A full-pipeline comparative case study on <strong>intermediate code representations</strong> (Quadruples vs. Triples vs. Indirect Triples), 
+          basic block leader algorithms, iterative control flow graph construction, classical basic block optimizations, and 
+          <strong>Static Single Assignment (SSA)</strong> construction comparing Cytron's iterated dominance frontiers against Braun's on-the-fly algorithm.
+        </p>
+        <div class="authors-row">
+          <span class="authors-label">Prepared By:</span>
+          <span class="author-tag"><strong>Amey Nagotkar</strong> (124BTCM1226)</span>
+          <span class="author-tag"><strong>Anand Raghvani</strong> (124BTCM1113)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benchmark Selection & Source Overview -->
+    <section class="benchmark-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2 class="section-title">Select Benchmark Program</h2>
+          <span class="section-caption">Explore compiler transformations on curated benchmarks from Stage-2 Report</span>
+        </div>
+      </div>
+
+      <div id="benchmark-selector" class="benchmark-grid" role="radiogroup" aria-label="Select benchmark">
+        <!-- Rendered via JavaScript -->
+      </div>
+
+      <!-- Source Code Display Panel -->
+      <div id="source-code-card" class="card source-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <span class="file-icon">📄</span>
+            <span id="source-filename" class="code-filename">bench/b1.mini</span>
+            <span id="source-lines-count" class="badge badge-neutral">9 lines</span>
+          </div>
+          <div class="card-header-right">
+            <button id="btn-toggle-source" class="btn btn-ghost btn-xs">
+              <span id="toggle-source-text">Hide Source</span>
+            </button>
+            <button id="btn-copy-source" class="btn btn-secondary btn-xs" title="Copy source code">
+              Copy Code
+            </button>
+          </div>
+        </div>
+        <div id="source-code-body" class="card-body source-code-body">
+          <pre class="code-pre line-numbers"><code id="source-code-content" class="language-c"></code></pre>
+        </div>
+        <div id="benchmark-desc-box" class="card-footer benchmark-desc-box">
+          <!-- Benchmark notes injected here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Pipeline Navigation Tabs -->
+    <section class="pipeline-section">
+      <div class="pipeline-nav-header">
+        <div class="section-title-wrap">
+          <h2 class="section-title">Compiler Transformation Stages</h2>
+          <span class="section-caption">Navigate through intermediate representations from Lexer to Optimized SSA</span>
+        </div>
+      </div>
+
+      <!-- Tab Buttons Stepper -->
+      <nav id="pipeline-tabs" class="pipeline-tabs" role="tablist" aria-label="Compilation Pipeline Stages">
+        <button id="tab-btn-tokens" class="tab-btn active" role="tab" aria-selected="true" data-tab="tokens">
+          <span class="tab-step">01</span>
+          <span class="tab-label">Tokens</span>
+        </button>
+        <button id="tab-btn-ast" class="tab-btn" role="tab" aria-selected="false" data-tab="ast">
+          <span class="tab-step">02</span>
+          <span class="tab-label">AST</span>
+        </button>
+        <button id="tab-btn-tac" class="tab-btn" role="tab" aria-selected="false" data-tab="tac">
+          <span class="tab-step">03</span>
+          <span class="tab-label">TAC IR</span>
+        </button>
+        <button id="tab-btn-formats" class="tab-btn" role="tab" aria-selected="false" data-tab="formats">
+          <span class="tab-step">04</span>
+          <span class="tab-label">IR Formats</span>
+        </button>
+        <button id="tab-btn-blocks" class="tab-btn" role="tab" aria-selected="false" data-tab="blocks">
+          <span class="tab-step">05</span>
+          <span class="tab-label">Basic Blocks</span>
+        </button>
+        <button id="tab-btn-cfg" class="tab-btn" role="tab" aria-selected="false" data-tab="cfg">
+          <span class="tab-step">06</span>
+          <span class="tab-label">CFG Diagram</span>
+        </button>
+        <button id="tab-btn-opt" class="tab-btn" role="tab" aria-selected="false" data-tab="opt">
+          <span class="tab-step">07</span>
+          <span class="tab-label">Optimizer</span>
+        </button>
+        <button id="tab-btn-ssa" class="tab-btn" role="tab" aria-selected="false" data-tab="ssa">
+          <span class="tab-step">08</span>
+          <span class="tab-label">SSA Form</span>
+        </button>
+        <button id="tab-btn-ssaopt" class="tab-btn" role="tab" aria-selected="false" data-tab="ssaopt">
+          <span class="tab-step">09</span>
+          <span class="tab-label">Sparse SSA Opt</span>
+        </button>
+        <button id="tab-btn-metrics" class="tab-btn" role="tab" aria-selected="false" data-tab="metrics">
+          <span class="tab-step">10</span>
+          <span class="tab-label">Metrics &amp; Costs</span>
+        </button>
+        <button id="tab-btn-all" class="tab-btn" role="tab" aria-selected="false" data-tab="all">
+          <span class="tab-step">11</span>
+          <span class="tab-label">Full Pipeline</span>
+        </button>
+      </nav>
+
+      <!-- Stage View Area -->
+      <div id="stage-display-container" class="stage-display-container">
+        <!-- Explanatory Header Box -->
+        <div id="stage-concept-box" class="stage-concept-box card">
+          <div class="concept-icon-wrap" id="concept-icon">💡</div>
+          <div class="concept-content">
+            <div class="concept-title-row">
+              <h3 id="concept-title" class="concept-title">Compiler Concept</h3>
+              <span id="concept-report-table" class="badge badge-accent">Reproduces Stage-2 Report Table</span>
+            </div>
+            <p id="concept-desc" class="concept-desc"></p>
+          </div>
+          <div class="stage-actions">
+            <div class="view-mode-toggle" id="view-mode-group">
+              <button id="btn-view-structured" class="btn btn-toggle active" title="Show interactive structured representation">Visual View</button>
+              <button id="btn-view-raw" class="btn btn-toggle" title="Show exact raw CLI output">CLI Output</button>
+            </div>
+            <button id="btn-copy-stage-output" class="btn btn-secondary btn-sm" title="Copy output of this stage">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Stage Body -->
+        <div id="stage-content-area" class="stage-content-area card">
+          <!-- Tab Contents Injected Dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal for Fullscreen CFG Diagram -->
+    <div id="cfg-modal" class="modal-backdrop" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3 id="cfg-modal-title" class="modal-title">Control Flow Graph Diagram</h3>
+          <div class="modal-controls">
+            <button id="btn-modal-zoom-in" class="btn btn-secondary btn-xs" title="Zoom in">+</button>
+            <button id="btn-modal-zoom-out" class="btn btn-secondary btn-xs" title="Zoom out">-</button>
+            <button id="btn-modal-zoom-reset" class="btn btn-secondary btn-xs" title="Reset zoom">Reset</button>
+            <button id="btn-modal-close" class="btn btn-ghost btn-xs" aria-label="Close modal">✕</button>
+          </div>
+        </div>
+        <div id="cfg-modal-body" class="modal-body">
+          <div id="cfg-modal-image-wrapper" class="cfg-modal-image-wrapper"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <div class="container footer-inner">
+      <div class="footer-col">
+        <h4>TAC Generator Case Study</h4>
+        <p>A rigorous empirical study on Three Address Code intermediate representation, memory footprint trade-offs, and SSA construction.</p>
+        <span class="text-muted">Repository: <a href="https://github.com/Amey-Nagotkar/tacgen" target="_blank" rel="noopener noreferrer">Amey-Nagotkar/tacgen</a></span>
+      </div>
+      <div class="footer-col">
+        <h4>Academic Attribution</h4>
+        <p>Mahavir Education Trust's Shah &amp; Anchor Kutchhi Engineering College (SAKEC)</p>
+        <p class="text-muted">Department of Computer Engineering &bull; Academic Year 2026-2027</p>
+      </div>
+      <div class="footer-col">
+        <h4>Key Theoretical References</h4>
+        <ul class="footer-links">
+          <li>Aho, Lam, Sethi, Ullman &bull; <em>Compilers: Principles, Techniques, and Tools</em></li>
+          <li>Cytron et al. &bull; <em>Efficiently Computing Static Single Assignment Form (TOPLAS 1991)</em></li>
+          <li>Braun et al. &bull; <em>Simple and Efficient Construction of SSA Form (CC 2013)</em></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data/benchmarks.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
