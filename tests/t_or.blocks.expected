@@ -1,0 +1,10 @@
+B1 [1-1] labels=- pred=- succ=B2(a >= b),B3(a < b)
+    if a < b goto L2
+B2 [2-2] labels=- pred=B1 succ=B3(c < d),B4(c >= d)
+    if c >= d goto L1
+B3 [3-3] labels=L2 pred=B1,B2 succ=B4
+    x = 1
+B4 [4-4] labels=L1 pred=B2,B3 succ=-
+    y = 0
+back edges: none
+blocks=4 edges=5 back_edges=0

@@ -1,0 +1,9 @@
+B1 [1-6] labels=- pred=- succ=-
+    t1 = minus c
+    t2 = b * t1
+    t3 = minus c
+    t4 = b * t3
+    t5 = t2 + t4
+    a = t5
+back edges: none
+blocks=1 edges=0 back_edges=0

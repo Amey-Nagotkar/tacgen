@@ -1,3 +1,4 @@
+#include "cfg.hpp"
 #include "formats.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
@@ -11,7 +12,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <file.mini> [--tokens] [--ast] [--tac] [--formats] [--edit-demo \"R:K,R:K\"] [--cfg out.dot] [--opt] [--ssa] [--metrics] [--live-out a,b,c] [--all]\n";
+        std::cerr << "Usage: " << argv[0] << " <file.mini> [--tokens] [--ast] [--tac] [--formats] [--blocks] [--cfg out.dot] [--edit-demo \"R:K,R:K\"] [--opt] [--ssa] [--metrics] [--live-out a,b,c] [--all]\n";
         return 1;
     }
 
@@ -20,6 +21,8 @@ int main(int argc, char* argv[]) {
     bool dump_ast = false;
     bool dump_tac = false;
     bool dump_formats = false;
+    bool dump_blocks = false;
+    std::string cfg_dot_file;
     std::string edit_demo_arg;
 
     for (int i = 1; i < argc; ++i) {
@@ -32,6 +35,17 @@ int main(int argc, char* argv[]) {
             dump_tac = true;
         } else if (arg == "--formats") {
             dump_formats = true;
+        } else if (arg == "--blocks") {
+            dump_blocks = true;
+        } else if (arg == "--cfg") {
+            if (i + 1 < argc) {
+                cfg_dot_file = argv[++i];
+            } else {
+                std::cerr << "Error: --cfg requires output filename\n";
+                return 1;
+            }
+        } else if (arg.rfind("--cfg=", 0) == 0) {
+            cfg_dot_file = arg.substr(6);
         } else if (arg == "--edit-demo") {
             if (i + 1 < argc) {
                 edit_demo_arg = argv[++i];
@@ -102,6 +116,17 @@ int main(int argc, char* argv[]) {
             EditCost t_cost = FormatsManager::applyEliminations(Format::TRIPLES, pairs, tacgen.quads());
             EditCost i_cost = FormatsManager::applyEliminations(Format::INDIRECT_TRIPLES, pairs, tacgen.quads());
             FormatsManager::print_edit_demo(q_cost, t_cost, i_cost, std::cout);
+            return 0;
+        }
+
+        if (dump_blocks || !cfg_dot_file.empty()) {
+            Cfg cfg = buildCfg(tacgen.quads());
+            if (dump_blocks) {
+                cfg.print_blocks(std::cout);
+            }
+            if (!cfg_dot_file.empty()) {
+                cfg.write_dot_file(cfg_dot_file);
+            }
             return 0;
         }
     } catch (const ParseError& ex) {

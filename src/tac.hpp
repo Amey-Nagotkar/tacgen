@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cctype>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -65,3 +67,133 @@ struct Quad {
         return "";
     }
 };
+
+// =============================================================================
+// Shared Helpers for Analysis and Optimization
+// =============================================================================
+
+// Matches temporary variable naming convention: ^t[0-9]+$
+inline bool isTemp(const std::string& name) {
+    if (name.size() < 2 || name[0] != 't') return false;
+    for (size_t i = 1; i < name.size(); ++i) {
+        if (!std::isdigit(static_cast<unsigned char>(name[i]))) return false;
+    }
+    return true;
+}
+
+// Matches integer literals (optionally signed): ^-?[0-9]+$
+inline bool isLiteral(const std::string& name) {
+    if (name.empty()) return false;
+    size_t i = 0;
+    if (name[0] == '-') {
+        if (name.size() == 1) return false;
+        i = 1;
+    }
+    for (; i < name.size(); ++i) {
+        if (!std::isdigit(static_cast<unsigned char>(name[i]))) return false;
+    }
+    return true;
+}
+
+// Inverts relational operators: < <-> >=, <= <-> >, == <-> !=
+inline std::string invert_relop(const std::string& relop) {
+    if (relop == "<")  return ">=";
+    if (relop == "<=") return ">";
+    if (relop == ">")  return "<=";
+    if (relop == ">=") return "<";
+    if (relop == "==") return "!=";
+    if (relop == "!=") return "==";
+    throw std::runtime_error("Unknown relational operator: " + relop);
+}
+
+// Returns the scalar variable defined by the Quad, or empty string if none.
+// (ARRAY_STORE defines memory element, not scalar variable).
+inline std::string defOf(const Quad& q) {
+    switch (q.op) {
+        case OpType::ASSIGN:
+        case OpType::BINOP:
+        case OpType::UNARY_MINUS:
+        case OpType::CALL:
+        case OpType::ARRAY_LOAD:
+            return q.result;
+        default:
+            return "";
+    }
+}
+
+// Returns mutable pointers to every operand that is a USE in the Quad.
+// Non-empty operands are returned; callers filter literals using isLiteral().
+inline std::vector<std::string*> usesOf(Quad& q) {
+    std::vector<std::string*> res;
+    auto add = [&](std::string& s) {
+        if (!s.empty()) res.push_back(&s);
+    };
+    switch (q.op) {
+        case OpType::IF_REL:
+            add(q.arg1);
+            add(q.arg2);
+            break;
+        case OpType::RETURN:
+        case OpType::PARAM:
+        case OpType::ASSIGN:
+        case OpType::UNARY_MINUS:
+            add(q.arg1);
+            break;
+        case OpType::BINOP:
+            add(q.arg1);
+            add(q.arg2);
+            break;
+        case OpType::ARRAY_LOAD:
+            add(q.arg1);
+            add(q.arg2);
+            break;
+        case OpType::ARRAY_STORE:
+            add(q.result); // array identifier
+            add(q.arg1);   // index
+            add(q.arg2);   // value
+            break;
+        case OpType::CALL:
+        case OpType::GOTO:
+        case OpType::NOP:
+            break;
+    }
+    return res;
+}
+
+// Const overload of usesOf
+inline std::vector<const std::string*> usesOf(const Quad& q) {
+    std::vector<const std::string*> res;
+    auto add = [&](const std::string& s) {
+        if (!s.empty()) res.push_back(&s);
+    };
+    switch (q.op) {
+        case OpType::IF_REL:
+            add(q.arg1);
+            add(q.arg2);
+            break;
+        case OpType::RETURN:
+        case OpType::PARAM:
+        case OpType::ASSIGN:
+        case OpType::UNARY_MINUS:
+            add(q.arg1);
+            break;
+        case OpType::BINOP:
+            add(q.arg1);
+            add(q.arg2);
+            break;
+        case OpType::ARRAY_LOAD:
+            add(q.arg1);
+            add(q.arg2);
+            break;
+        case OpType::ARRAY_STORE:
+            add(q.result); // array identifier
+            add(q.arg1);   // index
+            add(q.arg2);   // value
+            break;
+        case OpType::CALL:
+        case OpType::GOTO:
+        case OpType::NOP:
+            break;
+    }
+    return res;
+}

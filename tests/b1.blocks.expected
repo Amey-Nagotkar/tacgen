@@ -1,0 +1,16 @@
+B1 [1-2] labels=- pred=- succ=B2
+    s = 0
+    i = 1
+B2 [3-3] labels=L1 pred=B1,B3 succ=B3(i <= n),B4(i > n)
+    if i > n goto L2
+B3 [4-9] labels=- pred=B2 succ=B2
+    t1 = i * 2
+    t2 = s + t1
+    s = t2
+    t3 = i + 1
+    i = t3
+    goto L1
+B4 [10-10] labels=L2 pred=B2 succ=-
+    return s
+back edges: B3->B2
+blocks=4 edges=4 back_edges=1
