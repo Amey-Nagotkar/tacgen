@@ -1,0 +1,14 @@
+digraph CFG {
+  node [shape=box, fontname="Courier"];
+  edge [fontname="Courier"];
+
+  B1 [label="B1\ls = 0\li = 1\l"];
+  B2 [label="B2 (L1)\lif i > n goto L2\l"];
+  B3 [label="B3\lt1 = i * 2\lt2 = s + t1\ls = t2\lt3 = i + 1\li = t3\lgoto L1\l"];
+  B4 [label="B4 (L2)\lreturn s\l"];
+
+  B1 -> B2;
+  B2 -> B3 [label="i <= n"];
+  B2 -> B4 [label="i > n"];
+  B3 -> B2 [color=red];
+}

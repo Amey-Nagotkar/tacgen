@@ -1,0 +1,7 @@
+digraph CFG {
+  node [shape=box, fontname="Courier"];
+  edge [fontname="Courier"];
+
+  B1 [label="B1\lt1 = minus c\lt2 = b * t1\lt3 = minus c\lt4 = b * t3\lt5 = t2 + t4\la = t5\l"];
+
+}
